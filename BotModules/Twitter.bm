@@ -1,0 +1,52 @@
+# -*- Mode: perl; tab-width: 4; indent-tabs-mode: nil; -*-
+# see http://mxr.mozilla.org/mozilla/source/webtools/mozbot/BotModules/devel.txt
+
+package BotModules::Twitter;
+use Net::Twitter::Lite;
+use base qw( BotModules );
+1;
+
+
+sub Help {
+    my $self = shift;
+    my ($event) = @_;
+
+    return {
+	'' => 'IRC to Twitter gateway',
+	'twitter' => 'Send command to twitter (only update command currently)',
+    };
+}
+
+
+sub RegisterConfig {
+    my $self = shift;
+    $self->SUPER::RegisterConfig(@_);
+    $self->registerVariables(
+        ['username', 1, 1, 'Foswiki'],
+        ['password', 1, 1, undef],
+        ['clientname', 1, 1, '#foswiki'],
+    );
+}
+
+
+sub Told {
+    my $self = shift;
+    my ($event, $message) = @_;
+    if ($message =~ /^\s*twitter\s+update\s+(.*)$/osi) {
+        my $tweet;
+        $tweet .= '(' . $event->{from} . ') ' if $event->{from};
+        $tweet .= $1;
+
+        my $twitter = Net::Twitter->new(
+            username   => $self->{username},
+            password   => $self->{password},
+            clientname => $self->{clientname},
+            );
+
+        $twitter->update( $tweet );
+        $self->say( $event, 'twitted' );
+    } else {
+        return $self->SUPER::Told(@_);
+    }
+    return 0;
+}
