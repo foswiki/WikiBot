@@ -26,7 +26,8 @@ sub RegisterConfig {
     $self->registerVariables(
         ['username', 1, 1, undef],
         ['password', 1, 1, undef],
-        ['clientname', 1, 1, '#foswiki'],
+        ['clientname', 1, 1, undef],
+        ['clienturl', 1, 1, undef],
     );
 }
 
@@ -42,8 +43,8 @@ sub Told {
         my $twitter = Net::Twitter::Lite->new(
             username   => $self->{username},
             password   => $self->{password},
-            clientname => '#foswiki',
-            clienturl  => 'http://foswiki.org/Development/FoswikiBot',
+            clientname => $self->{clientname},
+            clienturl  => $self->{clienturl},
             );
 
         $twitter->update( $tweet );
