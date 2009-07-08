@@ -1,6 +1,8 @@
 # -*- Mode: perl; tab-width: 4; indent-tabs-mode: nil; -*-
 # see http://mxr.mozilla.org/mozilla/source/webtools/mozbot/BotModules/devel.txt
 
+use lib qw( /root/lib/CPAN/lib /root/lib/CPAN/lib/arch );
+
 package BotModules::Twitter;
 use Net::Twitter::Lite;
 use base qw( BotModules );
@@ -12,8 +14,8 @@ sub Help {
     my ($event) = @_;
 
     return {
-	'' => 'IRC to Twitter gateway',
-	'twitter' => 'Send command to twitter (only update command currently)',
+        '' => 'The Twitter module provides an IRC to Twitter gateway.',
+        'tweet' => 'Post a tweet to twitter',
     };
 }
 
@@ -22,7 +24,7 @@ sub RegisterConfig {
     my $self = shift;
     $self->SUPER::RegisterConfig(@_);
     $self->registerVariables(
-        ['username', 1, 1, 'Foswiki'],
+        ['username', 1, 1, undef],
         ['password', 1, 1, undef],
         ['clientname', 1, 1, '#foswiki'],
     );
@@ -32,19 +34,20 @@ sub RegisterConfig {
 sub Told {
     my $self = shift;
     my ($event, $message) = @_;
-    if ($message =~ /^\s*twitter\s+update\s+(.*)$/osi) {
-        my $tweet;
+    if ($message =~ /^\s*tweet\s+(.*)$/osi) {
+        my $tweet = '';
         $tweet .= '(' . $event->{from} . ') ' if $event->{from};
         $tweet .= $1;
 
-        my $twitter = Net::Twitter->new(
+        my $twitter = Net::Twitter::Lite->new(
             username   => $self->{username},
             password   => $self->{password},
-            clientname => $self->{clientname},
+            clientname => '#foswiki',
+            clienturl  => 'http://foswiki.org/Development/FoswikiBot',
             );
 
         $twitter->update( $tweet );
-        $self->say( $event, 'twitted' );
+        $self->emote( $event, qq{twitted "$tweet"} );
     } else {
         return $self->SUPER::Told(@_);
     }
