@@ -5,7 +5,8 @@ use lib qw( /root/lib/CPAN/lib /root/lib/CPAN/lib/arch );
 
 package BotModules::Twitter;
 use Net::Twitter::Lite;
-use base qw( BotModules );
+use BotModules;
+our @ISA = qw( BotModules );
 1;
 
 
