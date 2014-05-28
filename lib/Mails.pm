@@ -75,6 +75,7 @@ sub sendmail {
         $smtp->to($to);
         $smtp->data(<<end);
 X-Mailer: $0, Mails.pm; $$Mails::owner
+Auto-Submitted: auto-generated
 To: $to
 From: $from
 Subject: $subject
